@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -18,7 +18,12 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: your-aws-region
+        aws-region: ap-south-1
+
+    - name: Install Nginx
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nginx
 
     - name: Deploy to EC2
       run: |
@@ -26,5 +31,14 @@ jobs:
         # For example:
         # scp -i /path/to/your/private-key.pem -r ./your-app ubuntu@your-ec2-ip:/path/to/deploy
         # ssh -i /path/to/your/private-key.pem ubuntu@your-ec2-ip "cd /path/to/deploy && ./deploy.sh"
+        
+        # Create a simple HTML file with "Hello, World!"
+        echo "<html><body><h1>Hello, World!</h1></body></html>" > index.html
+        
+        # Copy the HTML file to the default Nginx web root directory
+        sudo cp index.html /var/www/html/
+        
+        # Restart Nginx to apply changes
+        sudo service nginx restart
 
     # Add more steps as needed, such as running tests, building your application, etc.
